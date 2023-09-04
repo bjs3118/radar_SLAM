@@ -4,6 +4,8 @@ function [cmplxArray] = cmplx_from_array(array,k)
 if mod(length(array), k) ~= 0
     error("Length of array is not divisible by k")
 end 
+
+% Unoptimised code
 % 
 % oItLen = length(array)/(2*k);
 % cmplxArray = [];
@@ -20,6 +22,8 @@ end
 %     end 
 % end 
 
+
+% Optimised code 
 oItLen = length(array) / (2 * k);
 cmplxArray = complex(zeros(1, oItLen * k));
 
