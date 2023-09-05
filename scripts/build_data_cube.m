@@ -1,21 +1,24 @@
-function [dataCube] = build_data_cube(dataChunk, nFast, nRx, nTx, nSlow)
-% Builds data cube from raw ADC input
-%  
+function [dataCube] = build_data_cube(data, nFast, nRx, nTx, nSlow, k)
+%BUILD_DATA_CUBE_3 Summary of this function goes here
+%   Detailed explanation goes here
 
-% Check if the dimensions match
-if length(dataChunk) ~= nFast*nSlow*nRx*2
-    error(['Number of ADC samples does not match config.\n', ...
-           'Length of dataChunk: %d\nConfig: %s'], length(dataChunk), nFast*nSlow*nRx*2);
+nSlow = (nSlow / 2);
+nCh = nRx * nTx;
+
+data1 = cmplx_from_array(data, k);
+
+
+% Reshape data into a 3D array with dimensions nchirp, nrb, and nch
+% dataCube = reshape(data1, [nTx, nRx, nFast, nSlow]);
+dataQuad = reshape(data1, [nRx, nFast, nTx, nSlow]);
+
+% [slow, fast, nRx, nTx]
+% dataCube = permute(dataCube, [4, 3, 2, 1]);
+dataQuad = permute(dataQuad, [4, 2, 1, 3]);
+dc1 = squeeze(dataQuad(:, :, :, 1));
+dc2 = squeeze(dataQuad(:, :, :, 2));
+
+dataCube = cat(3, dc1, dc2);
+dataCube = permute(dataCube, [2, 3, 1]);
+
 end
-
-dataChunk = double(dataChunk) - (double(dataChunk) >= 2^15) * 2^16;
-
-len = length(dataChunk) / 2;
-adcOut(1:2:len) = dataChunk(1:4:end) + 1j*dataChunk(3:4:end);
-adcOut(2:2:len) = dataChunk(2:4:end) + 1j*dataChunk(4:4:end);
-
-adcOut = reshape(adcOut, [nFast, nRx*nTx, nSlow/2]);
-dataCube = adcOut;
-
-end
-
