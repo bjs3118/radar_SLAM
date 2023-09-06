@@ -1,9 +1,16 @@
-function [radarData] = extract_data(bagPath, frames, nFast, nRx, nTx, nSlow, k)
+function [bag, radarData] = extract_data(bagPath, frames, nFast, nRx, nTx, nSlow, k)
 %EXTRACT_DATA Extracts data from ROS bag, builds MIMO data cubes(s).
 %   Detailed explanation goes here
 
-disp("Opening bag");
-bag = rosbag(bagPath);
+if ~exist('bag')
+
+    disp("Opening bag");
+    bag = rosbag(bagPath);
+
+else 
+    disp("Bag already exists, using loaded bag");
+
+end 
 
 disp("Extracting radar messages");
 radars = select(bag, "MessageType", "mmWave/data_frame", "Topic", "/radar_data");
@@ -21,6 +28,9 @@ for i=1:length(radar1)
     currentCell = radar1{i, 1};
     dataCube = build_data_cube(currentCell.Data, nFast, nRx, nTx, nSlow, k);
     radarData{i}.dataCube = dataCube;
+    disp(i);
+    drawnow;
+
 end 
 
 end

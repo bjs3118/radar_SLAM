@@ -15,7 +15,7 @@ for i=1:length(radarData)
     % figure;
     % imagesc((abs(squeeze(rdProc(:, 1, :)))));
 
-    raProc = fftshift(fft(rdProc, 64, 2), 2);
+    raProc = fftshift(fft(rangeProc, 64, 2), 2);
     % figure;
     % imagesc((abs(squeeze(raProc(:, :, 1)))));
 
